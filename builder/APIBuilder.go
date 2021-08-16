@@ -4,32 +4,32 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	. "github.com/nntaoli-project/goex"
-	"github.com/nntaoli-project/goex/bigone"
-	"github.com/nntaoli-project/goex/binance"
-	"github.com/nntaoli-project/goex/bitfinex"
-	"github.com/nntaoli-project/goex/bithumb"
-	"github.com/nntaoli-project/goex/bitmex"
-	"github.com/nntaoli-project/goex/bitstamp"
-	"github.com/nntaoli-project/goex/bittrex"
-	"github.com/nntaoli-project/goex/coinbene"
-	"github.com/nntaoli-project/goex/kucoin"
+	. "github.com/lucas7788/goex"
+	"github.com/lucas7788/goex/bigone"
+	"github.com/lucas7788/goex/binance"
+	"github.com/lucas7788/goex/bitfinex"
+	"github.com/lucas7788/goex/bithumb"
+	"github.com/lucas7788/goex/bitmex"
+	"github.com/lucas7788/goex/bitstamp"
+	"github.com/lucas7788/goex/bittrex"
+	"github.com/lucas7788/goex/coinbene"
+	"github.com/lucas7788/goex/kucoin"
 
-	"github.com/nntaoli-project/goex/atop"
-	//"github.com/nntaoli-project/goex/coin58"
+	"github.com/lucas7788/goex/atop"
+	//"github.com/lucas7788/goex/coin58"
 	"net"
 	"net/http"
 	"net/url"
 	"time"
 
-	"github.com/nntaoli-project/goex/coinex"
-	"github.com/nntaoli-project/goex/gdax"
-	"github.com/nntaoli-project/goex/hitbtc"
-	"github.com/nntaoli-project/goex/huobi"
-	"github.com/nntaoli-project/goex/kraken"
-	"github.com/nntaoli-project/goex/okex"
-	"github.com/nntaoli-project/goex/poloniex"
-	"github.com/nntaoli-project/goex/zb"
+	"github.com/lucas7788/goex/coinex"
+	"github.com/lucas7788/goex/gdax"
+	"github.com/lucas7788/goex/hitbtc"
+	"github.com/lucas7788/goex/huobi"
+	"github.com/lucas7788/goex/kraken"
+	"github.com/lucas7788/goex/okex"
+	"github.com/lucas7788/goex/poloniex"
+	"github.com/lucas7788/goex/zb"
 )
 
 type APIBuilder struct {
@@ -43,6 +43,7 @@ type APIBuilder struct {
 	futuresEndPoint  string
 	endPoint         string
 	futuresLever     float64
+	Simulated        bool
 }
 
 type HttpClientConfig struct {
@@ -125,6 +126,11 @@ func (builder *APIBuilder) GetHttpClientConfig() *HttpClientConfig {
 
 func (builder *APIBuilder) GetHttpClient() *http.Client {
 	return builder.client
+}
+
+func (builder *APIBuilder) SetSimulated(boo bool) (_builder *APIBuilder) {
+	builder.Simulated = boo
+	return builder
 }
 
 func (builder *APIBuilder) HttpProxy(proxyUrl string) (_builder *APIBuilder) {
@@ -213,12 +219,17 @@ func (builder *APIBuilder) Build(exName string) (api API) {
 			ApiKey:       builder.apiKey,
 			ApiSecretKey: builder.secretkey})
 	case OKEX_V3, OKEX:
+		s := false
+		if builder.Simulated {
+			s = true
+		}
 		_api = okex.NewOKEx(&APIConfig{
 			HttpClient:    builder.client,
 			ApiKey:        builder.apiKey,
 			ApiSecretKey:  builder.secretkey,
 			ApiPassphrase: builder.apiPassphrase,
 			Endpoint:      builder.endPoint,
+			Simulated:     s,
 		})
 	case BITFINEX:
 		_api = bitfinex.New(builder.client, builder.apiKey, builder.secretkey)

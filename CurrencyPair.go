@@ -64,6 +64,7 @@ var (
 	DASH    = Currency{"DASH", ""}
 	CRV     = Currency{"CRV", ""}
 	ALGO    = Currency{"ALGO", ""}
+	WING    = Currency{"WING", ""}
 
 	//currency pair
 	BTC_KRW = CurrencyPair{CurrencyA: BTC, CurrencyB: KRW, AmountTickSize: 2, PriceTickSize: 1}
@@ -142,6 +143,8 @@ var (
 	HSR_ETH = CurrencyPair{CurrencyA: HSR, CurrencyB: ETH, AmountTickSize: 2, PriceTickSize: 4}
 	LTC_ETH = CurrencyPair{CurrencyA: LTC, CurrencyB: ETH, AmountTickSize: 2, PriceTickSize: 4}
 
+	WING_USDT = CurrencyPair{CurrencyA: WING, CurrencyB: USDT, AmountTickSize: 2, PriceTickSize: 3}
+
 	UNKNOWN_PAIR = CurrencyPair{CurrencyA: UNKNOWN, CurrencyB: UNKNOWN}
 )
 
@@ -211,6 +214,8 @@ func NewCurrency(symbol, desc string) Currency {
 		return TRX
 	case "dot", "DOT":
 		return DOT
+	case "wing", "WING":
+		return WING
 	default:
 		return Currency{strings.ToUpper(symbol), desc}
 	}
@@ -273,6 +278,11 @@ func (pair CurrencyPair) AdaptUsdToUsdt() CurrencyPair {
 func (pair CurrencyPair) ToLower() CurrencyPair {
 	return CurrencyPair{CurrencyA: Currency{Symbol: strings.ToLower(pair.CurrencyA.Symbol), Desc: pair.CurrencyA.Desc},
 		CurrencyB: Currency{Symbol: strings.ToLower(pair.CurrencyB.Symbol), Desc: pair.CurrencyB.Desc}}
+}
+
+func (pair CurrencyPair) ToUpper() CurrencyPair {
+	return CurrencyPair{CurrencyA: Currency{Symbol: strings.ToUpper(pair.CurrencyA.Symbol), Desc: pair.CurrencyA.Desc},
+		CurrencyB: Currency{Symbol: strings.ToUpper(pair.CurrencyB.Symbol), Desc: pair.CurrencyB.Desc}}
 }
 
 func (pair CurrencyPair) Reverse() CurrencyPair {

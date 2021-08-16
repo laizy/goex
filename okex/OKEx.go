@@ -6,8 +6,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/google/uuid"
-	. "github.com/nntaoli-project/goex"
-	"github.com/nntaoli-project/goex/internal/logger"
+	. "github.com/lucas7788/goex"
+	"github.com/lucas7788/goex/internal/logger"
 	"strings"
 	"sync"
 	"time"
@@ -17,7 +17,7 @@ const baseUrl = "https://www.okex.com"
 
 type OKEx struct {
 	config          *APIConfig
-	OKExSpot        *OKExSpot
+	OKExSpot        *OKExSpotV5
 	OKExFuture      *OKExFuture
 	OKExSwap        *OKExSwap
 	OKExWallet      *OKExWallet
@@ -25,6 +25,9 @@ type OKEx struct {
 	OKExV3FuturesWs *OKExV3FuturesWs
 	OKExV3SpotWs    *OKExV3SpotWs
 	OKExV3SwapWs    *OKExV3SwapWs
+	OKExAssetV5     *OKExAssetV5
+	OKExWalletV5    *OKExWalletV5
+	Simulated       bool
 }
 
 func NewOKEx(config *APIConfig) *OKEx {
@@ -32,7 +35,7 @@ func NewOKEx(config *APIConfig) *OKEx {
 		config.Endpoint = baseUrl
 	}
 	okex := &OKEx{config: config}
-	okex.OKExSpot = &OKExSpot{okex}
+	okex.OKExSpot = &OKExSpotV5{okex}
 	okex.OKExFuture = &OKExFuture{OKEx: okex, Locker: new(sync.Mutex)}
 	okex.OKExWallet = &OKExWallet{okex}
 	okex.OKExMargin = &OKExMargin{okex}
@@ -40,6 +43,9 @@ func NewOKEx(config *APIConfig) *OKEx {
 	okex.OKExV3FuturesWs = NewOKExV3FuturesWs(okex)
 	okex.OKExV3SpotWs = NewOKExSpotV3Ws(okex)
 	okex.OKExV3SwapWs = NewOKExV3SwapWs(okex)
+	okex.Simulated = config.Simulated
+	okex.OKExAssetV5 = &OKExAssetV5{okex}
+	okex.OKExWalletV5 = &OKExWalletV5{okex}
 	return okex
 }
 
@@ -53,16 +59,22 @@ func (ok *OKEx) UUID() string {
 
 func (ok *OKEx) DoRequest(httpMethod, uri, reqBody string, response interface{}) error {
 	url := ok.config.Endpoint + uri
+	fmt.Println("url:", url)
 	sign, timestamp := ok.doParamSign(httpMethod, uri, reqBody)
 	//logger.Log.Debug("timestamp=", timestamp, ", sign=", sign)
-	resp, err := NewHttpRequest(ok.config.HttpClient, httpMethod, url, reqBody, map[string]string{
+	header := map[string]string{
 		CONTENT_TYPE: APPLICATION_JSON_UTF8,
 		ACCEPT:       APPLICATION_JSON,
 		//COOKIE:               LOCALE + "en_US",
 		OK_ACCESS_KEY:        ok.config.ApiKey,
 		OK_ACCESS_PASSPHRASE: ok.config.ApiPassphrase,
 		OK_ACCESS_SIGN:       sign,
-		OK_ACCESS_TIMESTAMP:  fmt.Sprint(timestamp)})
+		OK_ACCESS_TIMESTAMP:  fmt.Sprint(timestamp)}
+	// 模拟盘交易
+	if ok.Simulated {
+		header["x-simulated-trading"] = "1"
+	}
+	resp, err := NewHttpRequest(ok.config.HttpClient, httpMethod, url, reqBody, header)
 	if err != nil {
 		//log.Println(err)
 		return err
