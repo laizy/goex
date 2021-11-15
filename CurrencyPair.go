@@ -65,6 +65,9 @@ var (
 	CRV     = Currency{"CRV", ""}
 	ALGO    = Currency{"ALGO", ""}
 	WING    = Currency{"WING", ""}
+	NULS    = Currency{"NULS", ""}
+	LINK    = Currency{"LINK", ""}
+	CHE    = Currency{"CHE", ""}
 	SUSHI    = Currency{"SUSHI", ""}
 
 	//currency pair
@@ -145,6 +148,9 @@ var (
 	LTC_ETH = CurrencyPair{CurrencyA: LTC, CurrencyB: ETH, AmountTickSize: 2, PriceTickSize: 4}
 
 	WING_USDT = CurrencyPair{CurrencyA: WING, CurrencyB: USDT, AmountTickSize: 3, PriceTickSize: 3}
+	NULS_USDT = CurrencyPair{CurrencyA: NULS, CurrencyB: USDT, AmountTickSize: 3, PriceTickSize: 3}
+	LINK_USDT = CurrencyPair{CurrencyA: LINK, CurrencyB: USDT, AmountTickSize: 3, PriceTickSize: 3}
+	CHE_USDT = CurrencyPair{CurrencyA: CHE, CurrencyB: USDT, AmountTickSize: 4, PriceTickSize: 4}
 	SUSHI_USDT = CurrencyPair{CurrencyA: SUSHI, CurrencyB: USDT, AmountTickSize: 3, PriceTickSize: 4}
 
 	UNKNOWN_PAIR = CurrencyPair{CurrencyA: UNKNOWN, CurrencyB: UNKNOWN}
