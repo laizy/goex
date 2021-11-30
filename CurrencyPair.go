@@ -69,6 +69,8 @@ var (
 	LINK    = Currency{"LINK", ""}
 	CHE    = Currency{"CHE", ""}
 	SUSHI    = Currency{"SUSHI", ""}
+	UNI    = Currency{"UNI", ""}
+	CELT    = Currency{"CELT", ""}
 
 	//currency pair
 	BTC_KRW = CurrencyPair{CurrencyA: BTC, CurrencyB: KRW, AmountTickSize: 2, PriceTickSize: 1}
@@ -152,6 +154,8 @@ var (
 	LINK_USDT = CurrencyPair{CurrencyA: LINK, CurrencyB: USDT, AmountTickSize: 3, PriceTickSize: 3}
 	CHE_USDT = CurrencyPair{CurrencyA: CHE, CurrencyB: USDT, AmountTickSize: 4, PriceTickSize: 4}
 	SUSHI_USDT = CurrencyPair{CurrencyA: SUSHI, CurrencyB: USDT, AmountTickSize: 3, PriceTickSize: 4}
+	UNI_USDT = CurrencyPair{CurrencyA: UNI, CurrencyB: USDT, AmountTickSize: 3, PriceTickSize: 4}
+	CELT_USDT = CurrencyPair{CurrencyA: CELT, CurrencyB: USDT, AmountTickSize: 6, PriceTickSize: 6}
 
 	UNKNOWN_PAIR = CurrencyPair{CurrencyA: UNKNOWN, CurrencyB: UNKNOWN}
 )

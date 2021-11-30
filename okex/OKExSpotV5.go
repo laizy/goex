@@ -2,12 +2,14 @@ package okex
 
 import (
 	"fmt"
-	"github.com/go-openapi/errors"
-	. "github.com/lucas7788/goex"
 	"sort"
 	"strconv"
 	"strings"
+	"encoding/json"
 	"time"
+	
+	"github.com/go-openapi/errors"
+	. "github.com/lucas7788/goex"
 )
 
 type OKExSpotV5 struct {
@@ -49,20 +51,17 @@ func (ok *OKExSpotV5) PlaceOrder(ty string, ord *Order) (*Order, error) {
 	param := OrderParamV5{
 		ClOrdId: GenerateOrderClientId(32),
 		InstId:  ord.Currency.AdaptUsdToUsdt().ToUpper().ToSymbol("-"),
+		TdMode : "cash",
+		Sz : FloatToString(ord.Amount, 5),
 	}
 	switch ord.Side {
 	case BUY, SELL:
 		param.Side = strings.ToLower(ord.Side.String())
 		param.Px = FloatToString(ord.Price, 5)
-		param.Sz = FloatToString(ord.Amount, 5)
 	case SELL_MARKET:
-		param.TdMode = "cash"
 		param.Side = "sell"
-		param.Sz = FloatToString(ord.Amount, 5)
 	case BUY_MARKET:
-		param.TdMode = "cash"
 		param.Side = "buy"
-		param.Sz = FloatToString(ord.Amount, 5)
 	default:
 		panic("not support")
 	}
@@ -81,8 +80,6 @@ func (ok *OKExSpotV5) PlaceOrder(ty string, ord *Order) (*Order, error) {
 		param.OrdType = "ioc"
 	}
 
-	param.Sz = FloatToString(ord.Amount, 5)
-
 	jsonStr, _, _ := ok.OKEx.BuildRequestBody(param)
 	fmt.Println("jsonStr:", jsonStr)
 	var response OKRes
@@ -91,8 +88,8 @@ func (ok *OKExSpotV5) PlaceOrder(ty string, ord *Order) (*Order, error) {
 		return nil, err
 	}
 
+	fmt.Println("response:", JsonString(response))
 	if response.Code != "0" {
-		fmt.Println("response.Data: %v", response.Data)
 		return nil, errors.New(int32(ToInt(response.Code)), response.Msg)
 	}
 
@@ -107,6 +104,12 @@ func (ok *OKExSpotV5) PlaceOrder(ty string, ord *Order) (*Order, error) {
 	ord.Cid = r["clOrdId"].(string)
 	ord.OrderID2 = r["ordId"].(string)
 	return ord, nil
+}
+
+func JsonString(v interface{}) string {
+	buf,_  := json.MarshalIndent(v, "", "  ")
+	
+	return string(buf)
 }
 
 func (ok *OKExSpotV5) MarketBuy(amount, price string, currency CurrencyPair) (*Order, error) {
